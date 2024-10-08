@@ -21,7 +21,15 @@ public class NewsService : INewsService
 
     public async Task<List<News>> GetNewsByDates(DateTime from, DateTime to)
     {
-        throw new NotImplementedException();
+        var news = await _connection.QueryAsync<News>(
+            "SELECT title as Title, content as Content,date_of_publish as PublishDate FROM news WHERE date_of_publish BETWEEN @startDate AND @endDate ORDER BY date_of_publish ASC;",
+            new
+            {
+                startDate = from,
+                endDate = to
+            });
+
+        return news.ToList();
     }
 
     public async Task<string> GetMostUsedWords()
@@ -36,10 +44,18 @@ public class NewsService : INewsService
 
     public async Task ParseAndSaveNewsAsync()
     {
+        await _connection.ExecuteAsync("delete from news");
         using HttpClient client = new HttpClient();
-        for (int i = 1; i < 2; i++)
+        var usedPages = new List<int>();
+        for (int i = 0; i < 10; i++)
         {
-            var response = await client.GetAsync(BaseUrl + $"/api/today-news/?pn={i}&pSize=20");
+            Random random = new Random();
+            var randomNum = random.Next(15, 200);
+            while (usedPages.Contains(randomNum))
+                randomNum = random.Next(1, 55);
+
+            usedPages.Add(randomNum);
+            var response = await client.GetAsync(BaseUrl + $"/api/today-news/?pn={randomNum}&pSize=3");
             var content = await response.Content.ReadAsStringAsync();
 
             var jsonObject = JsonNode.Parse(content)!.AsObject();
@@ -51,12 +67,11 @@ public class NewsService : INewsService
                 var date = item?["published_date"]?.GetValue<string>();
                 var dateOfPublish = DateTime.Parse(date!);
                 var contentText = await ParseContentFromUrl(BaseUrl + item!["alias"]?.GetValue<string>());
-                await _connection.ExecuteAsync(@"insert into news (title,content,date_of_publish)
-            values (@title,@content,@date_of_publish)",
+                await _connection.ExecuteAsync("call insert_news(@title,@content,@date_of_publish)",
                     new { title = newsTitle, content = contentText, date_of_publish = dateOfPublish });
             }
         }
-        
+
         _logger.LogInformation("Parsed new news successfully");
     }
 
@@ -64,17 +79,16 @@ public class NewsService : INewsService
     {
         using HttpClient client = new HttpClient();
         var result = await client.GetAsync(url);
-        var html=await result.Content.ReadAsStringAsync();
-        
+        var html = await result.Content.ReadAsStringAsync();
+
         var pattern = @"<div class=""content"".*?>([\s\S]*?)<\/div>";
-        
+
         var match = Regex.Match(html, pattern);
 
         if (!match.Success) throw new Exception("Could not parse content");
         var content = match.Groups[1].Value;
-            
+
         var textOnly = Regex.Replace(content, "<.*?>", String.Empty).Trim();
         return textOnly;
-
     }
 }
