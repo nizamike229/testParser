@@ -2,7 +2,7 @@
 
 public class News
 {
-    public string Title { get; set; }
-    public string Content { get; set; }
-    public DateTime PublishDate { get; set; }
+    public required string Title { get; init; }
+    public required string Content { get; init; }
+    public required DateTime PublishDate { get; init; }
 }

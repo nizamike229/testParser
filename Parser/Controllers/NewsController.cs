@@ -42,4 +42,18 @@ public class NewsController : ControllerBase
             return BadRequest($"Error while performing request \n Error message: {e.Message}");
         }
     }
+
+    [ActionName("search")]
+    [HttpGet]
+    public async Task<ActionResult<List<News>>> GetNewsByWord([FromQuery] string word)
+    {
+        try
+        {
+            return Ok(await _newsService.GetNewsByWord(word));
+        }
+        catch (Exception e)
+        {
+            return BadRequest($"Error while performing request \n Error message: {e.Message}");
+        }
+    }
 }

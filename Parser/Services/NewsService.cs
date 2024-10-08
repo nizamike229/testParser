@@ -53,7 +53,15 @@ public class NewsService : INewsService
 
     public async Task<List<News>> GetNewsByWord(string word)
     {
-        throw new NotImplementedException();
+        var result = await _connection.QueryAsync<News>(
+            "select content as Content, title as Title, date_of_publish as PublishDate " +
+            "from news where lower(title) like '%' || @searchWord || '%';",
+            new
+            {
+                searchWord = word.ToLower()
+            });
+
+        return result.ToList();
     }
 
     public async Task ParseAndSaveNewsAsync()
