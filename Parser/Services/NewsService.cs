@@ -32,9 +32,23 @@ public class NewsService : INewsService
         return news.ToList();
     }
 
-    public async Task<string> GetMostUsedWords()
+    public async Task<Dictionary<string, int>> GetMostUsedWords()
     {
-        throw new NotImplementedException();
+        var allTexts = (await _connection.QueryAsync<string>("select content from news")).ToList();
+        var wordFrequency = new SortedDictionary<string, int>();
+
+        foreach (var text in allTexts)
+        {
+            var words = text.ToLower().Split([' ', ',', '.', '!', '?'], StringSplitOptions.RemoveEmptyEntries);
+            foreach (var word in words)
+            {
+                if (wordFrequency.TryAdd(word, 1)) continue;
+                wordFrequency[word]++;
+                break;
+            }
+        }
+
+        return wordFrequency.OrderByDescending(x => x.Value).Take(10).ToDictionary(x => x.Key, x => x.Value);
     }
 
     public async Task<List<News>> GetNewsByWord(string word)

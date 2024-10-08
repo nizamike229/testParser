@@ -19,6 +19,27 @@ public class NewsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<News>>> GetByDates([FromQuery] DateTime from, [FromQuery] DateTime to)
     {
-        return await _newsService.GetNewsByDates(from, to);
+        try
+        {
+            return await _newsService.GetNewsByDates(from, to);
+        }
+        catch (Exception e)
+        {
+            return BadRequest($"Error while performing request \n Error message: {e.Message}");
+        }
+    }
+
+    [ActionName("topTen")]
+    [HttpGet]
+    public async Task<ActionResult<Dictionary<string, int>>> GetTopTenWords()
+    {
+        try
+        {
+            return Ok(await _newsService.GetMostUsedWords());
+        }
+        catch (Exception e)
+        {
+            return BadRequest($"Error while performing request \n Error message: {e.Message}");
+        }
     }
 }
