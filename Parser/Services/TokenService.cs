@@ -9,7 +9,8 @@ public static class TokenService
 
     public static string GenerateToken(string username)
     {
-        var tokenPayload = $"{username}:{DateTime.UtcNow.Ticks}";
+        var encodedUsername = Convert.ToBase64String(Encoding.UTF8.GetBytes(username));
+        var tokenPayload = $"{encodedUsername}:{DateTime.UtcNow.Ticks}";
         var tokenSignature = SignToken(tokenPayload);
         return $"{tokenPayload}:{tokenSignature}";
     }
