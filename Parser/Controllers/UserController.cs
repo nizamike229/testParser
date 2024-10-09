@@ -47,4 +47,12 @@ public class UserController : ControllerBase
             return BadRequest($"Error while performing request \n Error message: {e.Message}");
         }
     }
+
+    [ActionName("logout")]
+    [HttpPost]
+    public ActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+        return Ok("Logged out successfully!");
+    }
 }
