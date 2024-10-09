@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebApplication1.CustomAttributes;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
 
@@ -6,6 +7,7 @@ namespace WebApplication1.Controllers;
 
 [ApiController]
 [Route("api/[action]")]
+[CustomAuthorize]
 public class NewsController : ControllerBase
 {
     private readonly INewsService _newsService;
