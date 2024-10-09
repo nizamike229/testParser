@@ -12,7 +12,17 @@ services.AddSwaggerGen();
 services.AddTransient<NpgsqlConnection>(_ =>
     new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 services.AddTransient<INewsService, NewsService>();
-services.AddHostedService<MyHostedService>();
+services.AddTransient<IUserService, UserService>();
+services.AddHostedService<MyHostedService>();   
+
+services.AddDistributedMemoryCache();
+
+services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(15);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -21,6 +31,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSession();
 
 app.UseAuthorization();
 
