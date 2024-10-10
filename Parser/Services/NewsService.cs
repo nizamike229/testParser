@@ -22,7 +22,7 @@ public class NewsService : INewsService
     public async Task<List<News>> GetNewsByDates(DateTime from, DateTime to)
     {
         var news = await _connection.QueryAsync<News>(
-            "SELECT title as Title, content as Content,date_of_publish as PublishDate FROM news WHERE date_of_publish BETWEEN @startDate AND @endDate ORDER BY date_of_publish ASC;",
+            "SELECT title as Title, content as Content,date_of_publish as PublishDate FROM news WHERE date_of_publish BETWEEN @startDate AND @endDate ORDER BY date_of_publish;",
             new
             {
                 startDate = from,
@@ -110,7 +110,13 @@ public class NewsService : INewsService
         if (!match.Success) throw new Exception("Could not parse content");
         var content = match.Groups[1].Value;
 
-        var textOnly = Regex.Replace(content, "<.*?>", String.Empty).Trim();
+        var textOnly = Regex.Replace(content, "<.*?>", string.Empty).Trim();
         return textOnly;
+    }
+
+    public async Task CreateTablesAsync()
+    {
+        await _connection.ExecuteAsync(
+            "create table news\n(\n    id              serial\n        constraint news_pk\n            primary key,\n    title           varchar(300) not null,\n    date_of_publish timestamp    not null,\n    content         varchar      not null\n);\n\ncreate table users\n(\n    id       serial\n        constraint users_pk\n            primary key,\n    username varchar(255),\n    password varchar(300)\n);\n\ncreate procedure insert_news(IN p_title text, IN p_content text, IN p_date_of_publish timestamp without time zone)\n    language plpgsql\nas\n$$\nBEGIN\n    INSERT INTO news (title, content, date_of_publish)\n    VALUES (p_title, p_content, p_date_of_publish);\nEND;\n$$;\n\ncreate procedure create_user(IN p_login text, IN p_password text)\n    language plpgsql\nas\n$$\nBEGIN\n    INSERT INTO users (username, password)\n    VALUES (p_login, p_password);\nEND;\n$$;\n\ncreate function check_user_valid(p_username character varying, p_password character varying) returns boolean\n    language plpgsql\nas\n$$\nDECLARE\n    stored_hash VARCHAR(255);\nBEGIN\n    SELECT password INTO stored_hash\n    FROM users\n    WHERE username = p_username;\n\n    IF stored_hash IS NULL THEN\n        RETURN false;\n    END IF;\n\n    RETURN stored_hash = p_password;\nEND;\n$$;\n\n");
     }
 }
