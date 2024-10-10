@@ -11,10 +11,22 @@ public class MyHostedService : IHostedService
         _newsService = newsService;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _newsService.ParseAndSaveNewsAsync();
-        return Task.CompletedTask;
+        for (var i = 0; i < 2; i++)
+        {
+            try
+            {
+                await _newsService.CreateTablesAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Database connection to migrate is missing");
+                Thread.Sleep(2000);
+            }
+        }
+        await _newsService.ParseAndSaveNewsAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
