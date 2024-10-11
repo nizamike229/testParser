@@ -42,7 +42,7 @@ public class NewsService : INewsService
             var words = text.ToLower().Split([' ', ',', '.', '!', '?'], StringSplitOptions.RemoveEmptyEntries);
             foreach (var word in words)
             {
-                if (word.Length<4) continue;
+                if (word.Length < 4) continue;
                 if (wordFrequency.TryAdd(word, 1)) continue;
                 wordFrequency[word]++;
                 break;
@@ -118,6 +118,6 @@ public class NewsService : INewsService
     public async Task CreateTablesAsync()
     {
         await _connection.ExecuteAsync(
-            "create table news\n(\n    id              serial\n        constraint news_pk\n            primary key,\n    title           varchar(300) not null,\n    date_of_publish timestamp    not null,\n    content         varchar      not null\n);\n\ncreate table users\n(\n    id       serial\n        constraint users_pk\n            primary key,\n    username varchar(255),\n    password varchar(300)\n);\n\ncreate procedure insert_news(IN p_title text, IN p_content text, IN p_date_of_publish timestamp without time zone)\n    language plpgsql\nas\n$$\nBEGIN\n    INSERT INTO news (title, content, date_of_publish)\n    VALUES (p_title, p_content, p_date_of_publish);\nEND;\n$$;\n\ncreate procedure create_user(IN p_login text, IN p_password text)\n    language plpgsql\nas\n$$\nBEGIN\n    INSERT INTO users (username, password)\n    VALUES (p_login, p_password);\nEND;\n$$;\n\ncreate function check_user_valid(p_username character varying, p_password character varying) returns boolean\n    language plpgsql\nas\n$$\nDECLARE\n    stored_hash VARCHAR(255);\nBEGIN\n    SELECT password INTO stored_hash\n    FROM users\n    WHERE username = p_username;\n\n    IF stored_hash IS NULL THEN\n        RETURN false;\n    END IF;\n\n    RETURN stored_hash = p_password;\nEND;\n$$;\n\n");
+            "create table if not exists news(    id              serial       constraint news_pk           primary key,   title           varchar(300) not null,   date_of_publish timestamp    not null,     content         varchar      not null );  create table if not exists users (     id       serial         constraint users_pk             primary key,     username varchar(255),     password varchar(300) );  create or replace procedure insert_news(IN p_title text, IN p_content text, IN p_date_of_publish timestamp without time zone)     language plpgsql as $$ BEGIN     INSERT INTO news (title, content, date_of_publish)     VALUES (p_title, p_content, p_date_of_publish); END; $$;  create or replace procedure create_user(IN p_login text, IN p_password text)     language plpgsql as $$ BEGIN     INSERT INTO users (username, password)     VALUES (p_login, p_password); END; $$;  create or replace function check_user_valid(p_username character varying, p_password character varying) returns boolean     language plpgsql as $$ DECLARE     stored_hash VARCHAR(255); BEGIN     SELECT password INTO stored_hash     FROM users     WHERE username = p_username;      IF stored_hash IS NULL THEN         RETURN false;     END IF;      RETURN stored_hash = p_password; END; $$;  ");
     }
 }
