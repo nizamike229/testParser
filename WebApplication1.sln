@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "Parser\Parser.csproj", "{9B3EB71C-21BB-404F-9A16-6822D403E737}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceTests", "ServiceTests\ServiceTests.csproj", "{6428310D-FA5E-4E66-9976-5085EE82EDD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{9B3EB71C-21BB-404F-9A16-6822D403E737}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B3EB71C-21BB-404F-9A16-6822D403E737}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B3EB71C-21BB-404F-9A16-6822D403E737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6428310D-FA5E-4E66-9976-5085EE82EDD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6428310D-FA5E-4E66-9976-5085EE82EDD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6428310D-FA5E-4E66-9976-5085EE82EDD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6428310D-FA5E-4E66-9976-5085EE82EDD4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
