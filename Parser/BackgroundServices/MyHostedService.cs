@@ -26,6 +26,7 @@ public class MyHostedService : IHostedService
                 Thread.Sleep(2000);
             }
         }
+
         await _newsService.ParseAndSaveNewsAsync();
     }
 

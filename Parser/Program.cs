@@ -13,7 +13,7 @@ services.AddTransient<NpgsqlConnection>(_ =>
     new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 services.AddTransient<INewsService, NewsService>();
 services.AddTransient<IUserService, UserService>();
-services.AddHostedService<MyHostedService>();   
+services.AddHostedService<MyHostedService>();
 
 services.AddDistributedMemoryCache();
 
