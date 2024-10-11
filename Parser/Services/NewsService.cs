@@ -42,6 +42,7 @@ public class NewsService : INewsService
             var words = text.ToLower().Split([' ', ',', '.', '!', '?'], StringSplitOptions.RemoveEmptyEntries);
             foreach (var word in words)
             {
+                if (word.Length<4) continue;
                 if (wordFrequency.TryAdd(word, 1)) continue;
                 wordFrequency[word]++;
                 break;
